@@ -5,3 +5,6 @@
 
 	// set "true" to enable debug output
 	$autodebug_enabled = false;
+
+	$mergerfs_disk_paths = glob("/mnt/data/disk*");
+	$mergerfs_pool_path = "/mnt/storage/";

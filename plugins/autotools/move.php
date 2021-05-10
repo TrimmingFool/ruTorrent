@@ -17,6 +17,47 @@ function Debug( $str )
 	if( $autodebug_enabled ) rtDbg( "AutoMove", $str );
 }
 
+function unpoolMergerFsPaths($files, $base_path, $dest_path)
+{
+	// unpool merged paths to avoid new pool branch by directory creation (at ./util_rt.php:204)
+	// when hardlinking $files in $base_path directory to $dest_path directory
+	// (TODO fix this for ../datadir/util_rt too ?refactor duplicate code?)
+	if ( str_starts_with( $base_path, $mergerfs_pool_path ) )
+	{
+		Debug( "Paths unchanged!" );
+		return array( $base_path, $dest_path );
+	}
+	$disk_paths = array_map( rtAddTailSlash, $mergerfs_disk_paths );
+	// identify disk directory of pool $base_path directory  
+	// -> assume that the all $files of $base_path directory exist only on ONE disk
+	Debug( "Looking through disks in pool:".$mergerfs_pool_path );
+	foreach ( $disk_paths as $disk_path)
+	{
+		Debug("Looking at disk:".$disk_path);
+		$unpooled_base_path = str_replace( $mergerfs_pool_path, $disk_path, $base_path );
+		if( $unpooled_base_path != $base_path && is_dir( $unpooled_base_path ) )
+		{
+			$filesExist = true;
+			foreach ($files as $file)
+			{
+				Debug("checking for file: ".$unpooled_base_path.$file);
+				if( !is_file( $unpooled_base_path.$file) )
+				{
+					$filesExist = false;
+					break;// file is not on this disk
+				}
+			}
+			if( $filesExist )
+			{
+				$unpooled_dest_path =  str_replace( $mergerfs_pool_path, $disk_path, $dest_path );
+				Debug( "unpooled paths:	 base_path:".$unpooled_base_path." dest_path:".$unpooled_dest_path );
+				return array( $unpooled_base_path, $unpooled_dest_path );
+			}
+		}
+	}
+	Debug( "Failure: No disk has all files!".$disk_paths );
+	return array( $base_path, $dest_path);
+}
 
 //------------------------------------------------------------------------------
 function skip_move($files) 
@@ -71,7 +112,13 @@ function operationOnTorrentFiles($torrent,&$base_path,$base_file,$is_multy_file,
 
 	if( $base_path != $dest_path && is_dir( $base_path ) )
 	{
-		if( rtOpFiles( $files, $base_path, $dest_path, $fileop_type, $autodebug_enabled ) )
+		$dst = $dest_path;
+		$src = $base_path;
+		if( $fileop_type == "HardLink")
+		{
+			list($src, $dst) = unpoolMergerFsPaths($files, $src, $dst);
+		}
+		if( rtOpFiles( $files, $src, $dst, $fileop_type, $autodebug_enabled ) )
 		{
 			if(($fileop_type=="Move") && ( $sub_dir != '' ))
 			{
