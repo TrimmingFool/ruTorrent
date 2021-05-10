@@ -83,3 +83,12 @@
 	$enableCSRFCheck = false;		// If true then Origin and Referer will be checked
 	$enabledOrigins = array();		// List of enabled domains for CSRF check (only hostnames, without protocols, port etc.).
 						// If empty, then will retrieve domain from HTTP_HOST / HTTP_X_FORWARDED_HOST
+
+	// fix for mergerfs (2.24.2) pool with 'ep' (existing path) policy
+	// creating new directory may cause new disk to be used (at plugins/{datadir,autotools}/util_rt.php:rtOpFiles)
+	// however, moving and hardlinking should be on one disk
+	$mergerfs_ep_policy_enabled = false;	// enables this fix: forces to use same pool disk on file operations
+	$mergerfs_disk_paths = glob("/mnt/data/disk*");
+	$mergerfs_pool_path = "/mnt/storage/";
+	$mergerfs_ignore_ops = array("SoftLink", "Copy"); // do not force 'same pool disk' for these operations (possible ops: "Hardlink", "Copy", "SoftLink", "Move")
+
