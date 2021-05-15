@@ -213,8 +213,8 @@ switch($mode)
 			$req->addCommand( new rXMLRPCCommand( $cmd ) );
 		if($req->success(false)) {
 			$result = $req->val;
-			if (count($cmds) < 3)
-				$result[] = -1;
+		if (count($cmds) < 3)
+			$result[] = rTorrentSettings::get()->readOpenFilesOfProcess();
 		}
 		break;
 	}
