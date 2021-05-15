@@ -1,4 +1,54 @@
 <?php
+/**
+ * $files in $base_path directory to $dest_path directory
+ *
+ * @return unpooled destination path
+ */
+function unpoolMergerFsDestPath($files, $base_path, $dest_path, $verbose=false)
+{
+	$pool_path = addslash( $mergerfs_pool_path );
+	$disk_paths = array_map( addslash, $mergerfs_disk_paths );
+	if ( str_starts_with( $base_path, $pool_path ) )
+	{
+		if ($verbose)
+			toLog( "epfix-- Dest path unchanged!" );
+		return array( $base_path, $dest_path );
+	}
+	// identify disk directory of pool $base_path directory
+	// -> assume that the all $files of $base_path directory exist only on ONE disk
+	if ($verbose)
+		toLog( "epfix-- Looking for disk in pool with all files: ".$pool_path );
+	foreach ( $disk_paths as $disk_path)
+	{
+		if ($verbose)
+			toLog("epfix-- Looking at disk: ".$disk_path);
+		$unpooled_base_path = str_replace( $pool_path, $disk_path, $base_path );
+		if( $unpooled_base_path != $base_path && is_dir( $unpooled_base_path ) )
+		{
+			$filesExist = true;
+			foreach ($files as $file)
+			{
+				if ($verbose)
+					toLog("epfix-- checking for file: ".$unpooled_base_path.$file);
+				if( !is_file( $unpooled_base_path.$file) )
+				{
+					$filesExist = false;
+					break;// file is not on this disk
+				}
+			}
+			if( $filesExist )
+			{
+				$unpooled_dest_path =  str_replace( $pool_path, $disk_path, $dest_path );
+				if ($verbose)
+					toLog( "epfix-- unpooled dest path: ".$unpooled_dest_path );
+				return $unpooled_dest_path;
+			}
+		}
+	}
+	if ($verbose)
+		toLog( "epfix-- Failure: No disk has all files! ".$disk_paths );
+	return $dest_path;
+}
 
 function stripSlashesFromArray(&$arr)
 {
