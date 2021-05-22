@@ -6,13 +6,17 @@
  */
 function unpoolMergerFsDestPath($files, $base_path, $dest_path, $verbose=false)
 {
+	global $mergerfs_pool_path;
+	global $mergerfs_disk_paths;
 	$pool_path = addslash( $mergerfs_pool_path );
 	$disk_paths = array_map( addslash, $mergerfs_disk_paths );
-	if ( str_starts_with( $base_path, $pool_path ) )
+	if ($verbose)
+		toLog( "epfix-- Base path:".$base_path." Pool:".$pool_path." Disks: ".join(", ", $disk_paths) );
+	if ( substr( $base_path, 0, strlen( $pool_path) ) !== $pool_path )
 	{
 		if ($verbose)
-			toLog( "epfix-- Dest path unchanged!" );
-		return array( $base_path, $dest_path );
+			toLog( "epfix-- Dest path:'".$dest_path."' unchanged!" );
+		return $dest_path;
 	}
 	// identify disk directory of pool $base_path directory
 	// -> assume that the all $files of $base_path directory exist only on ONE disk

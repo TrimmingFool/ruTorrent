@@ -200,7 +200,7 @@ function rtOpFiles( $files, $src, $dst, $op, $dbg = false )
 	}
 	else $src = rtAddTailSlash( $src );
 
-	if ( $mergerfs_ep_policy_enabled && !in_array( $op, $mergerfs_ignore_ops )
+	if ( $mergerfs_ep_policy_enabled && !in_array( $op, $mergerfs_ignore_ops ))
 	{
 		$dst = unpoolMergerFsDestPath( $files, $src, $dst, $dbg );
 	}
