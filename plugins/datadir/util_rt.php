@@ -184,6 +184,8 @@ function rtMoveFile( $src, $dst, $dbg = false )
 //------------------------------------------------------------------------------
 function rtOpFiles( $files, $src, $dst, $op, $dbg = false )
 {
+	global $mergerfs_ep_policy_enabled;
+	global $mergerfs_ignore_ops;
 	// Check if source and destination directories are valid
 	if( !is_array( $files ) || $src == '' || $dst == '' )
 	{
