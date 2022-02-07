@@ -5,7 +5,7 @@
 
 function $$(id)
 {
-	return((typeof id == 'string') ? document.getElementById(id) : id);
+	return((typeof id == 'string' && id != '') ? document.getElementById(id) : id);
 }
 
 function $type(obj)
