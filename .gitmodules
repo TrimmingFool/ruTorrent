@@ -1,0 +1,17 @@
+[submodule "plugins/theme/themes/DarkBetter"]
+	path = plugins/theme/themes/DarkBetter
+	url = https://github.com/TrimmingFool/DarkBetter
+[submodule "plugins/theme/themes/MaterialDesign"]
+	path = plugins/theme/themes/MaterialDesign
+	url = https://github.com/TrimmingFool/ruTorrent-MaterialDesign.git
+[submodule "plugins/toggle_details_button"]
+	path = plugins/toggle_details_button
+	url = https://github.com/Micdu70/plugin-toggle_details_button-ruTorrent.git
+[submodule "plugins/instantsearch"]
+	path = plugins/instantsearch
+	url = https://github.com/Micdu70/rutorrent-instantsearch.git
+[submodule "plugins/theme/themes/club-QuickBox"]
+	path = plugins/theme/themes/club-QuickBox
+	url = https://github.com/QuickBox/club-QuickBox
+[submodule "plugins/theme/themes/club-QuickBox/"]
+	url = https://github.com/TrimmingFool/club-QuickBox.git
