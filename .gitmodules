@@ -1,0 +1,9 @@
+[submodule "plugins/toggle_details_button"]
+	path = plugins/toggle_details_button
+	url = https://github.com/Micdu70/plugin-toggle_details_button-ruTorrent.git
+[submodule "plugins/theme/themes/club-QuickBox"]
+  path = plugins/theme/themes/club-QuickBox
+  url = https://github.com/TrimmingFool/club-QuickBox.git
+[submodule "plugins/geoip2"]
+	path = plugins/geoip2
+	url = https://github.com/Micdu70/geoip2-rutorrent
