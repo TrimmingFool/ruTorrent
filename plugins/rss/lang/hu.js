@@ -74,6 +74,8 @@
  theUILang.rssAllFiters			= "Minden szűrő";
  theUILang.rssUpdateInterval		= "Frissítési időköz";
  theUILang.rssShowErrorsDelayed		= "Az RSS hibaüzenet késleltetése, amíg a naplófül vagy az RSS feed láthatóvá nem válik";
+ theUILang.rssSanitizationLevel		= "Show external RSS content";
+ theUILang.rssSanitizationLevels	= {RESTRICTED: "Restricted (no links or images)", BASIC: "Basic (no images)", RELAXED: "Relaxed"};
  theUILang.Directories			= "Mappák";
  theUILang.Labels			= "Címkék";
 
