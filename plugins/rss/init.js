@@ -18,6 +18,7 @@ theWebUI.rssListVisible = false;
 theWebUI.rssShowErrorsDelayed = true;
 theWebUI.delayedRSSErrors = {};
 const catlist = theWebUI.categoryList;
+theWebUI.rssRelaxSanitization = 0;
 
 injectCustomElementCSS('panel-label', plugin.path + 'panel-label.css');
 injectCustomElementAttribute('panel-label', 'alert', function(oldValue, newValue) {
@@ -42,6 +43,7 @@ if(plugin.canChangeOptions())
 		{
 			$('#rss_interval').val(theWebUI.updateRSSInterval/60000);
 			$('#rss_show_errors_delayed').prop('checked', theWebUI.rssShowErrorsDelayed);
+			$('#rss_relax_sanitization').val(theWebUI.rssRelaxSanitization)
 		}
 		plugin.addAndShowSettings.call(theWebUI,arg);
 	}
@@ -49,7 +51,8 @@ if(plugin.canChangeOptions())
 	theWebUI.rssWasChanged = function()
 	{
 		return(	$('#rss_interval').val()!=theWebUI.updateRSSInterval/60000 ||
-		$('#rss_show_errors_delayed').prop('checked') != theWebUI.rssShowErrorsDelayed);
+		$('#rss_show_errors_delayed').prop('checked') != theWebUI.rssShowErrorsDelayed ||
+		$('#rss_relax_sanitization').val()!=theWebUI.rssRelaxSanitization);
 	}
 
 	plugin.setSettings = theWebUI.setSettings;
@@ -59,7 +62,8 @@ if(plugin.canChangeOptions())
 		if( plugin.enabled && this.rssWasChanged() ) {
 			theWebUI.RSSSetSettings(
 				$('#rss_interval').val(),
-				$('#rss_show_errors_delayed').prop('checked')
+				$('#rss_show_errors_delayed').prop('checked'),
+				$('#rss_relax_sanitization').val(),
 			);
 		}
 	}
@@ -284,11 +288,12 @@ theWebUI.getRSSSettings = function( d )
 	if (!theWebUI.rssShowErrorsDelayed) {
 		theWebUI.showDelayedRSSErrros();
 	}
+	theWebUI.rssRelaxSanitization = Number.parseInt(d.relaxsanitization) || 0;
 }
 
-theWebUI.RSSSetSettings = function( interval, delayErrorsUI )
+theWebUI.RSSSetSettings = function( interval, delayErrorsUI, relaxSanitization )
 {
-	this.request("?action=setrsssettings&s="+interval+"&s="+(delayErrorsUI ? 1 : 0),[this.getRSSSettings, this]);
+	this.request("?action=setrsssettings&" + [interval, delayErrorsUI ? 1 : 0, relaxSanitization].map(v => `s=${v}`).join('&'),[this.getRSSSettings, this]);
 }
 
 theWebUI.RSSMarkState = function( state )
@@ -1093,13 +1098,16 @@ rTorrentStub.prototype.getrssdetails = function()
 
 rTorrentStub.prototype.setrsssettings = function()
 {
-	this.rssCommon("mode=setsettings&interval="+this.ss[0]+"&delayerrui="+this.ss[1]);
+	this.rssCommon("mode=setsettings&" + ['interval', 'delayerrui', 'relaxsanitization'].map((n,i) => `${n}=${this.ss[i]}`).join('&'));
 }
 
 rTorrentStub.prototype.getrssdetailsResponse = function (data) {
 	if (!bbcode) return false;
-	const cfg = Sanitize.Config.RESTRICTED;
+	const cfg = Sanitize.Config[
+		Sanitize.Config.Levels[theWebUI.rssRelaxSanitization] || "RESTRICTED"
+	];
 	const s = new Sanitize({
+		...cfg,
 		elements: [...cfg.elements, "ins", "details", "summary"],
 		transformers: [bbcode.bbclassTransform],
 	});
@@ -1329,7 +1337,14 @@ plugin.onLangLoaded = function()
 			"<label for='rss_interval'>"+ theUILang.rssUpdateInterval + ' (' + theUILang.time_m.trim() +")</label>"+
 			"<input type='text' maxlength=4 id='rss_interval' class='TextboxShort'/><br/>"+
 			"<input type='checkbox' class='chk' id='rss_show_errors_delayed'/>"+
-			"<label for='rss_show_errors_delayed'>"+ theUILang.rssShowErrorsDelayed +"</label>"+
+			"<label for='rss_show_errors_delayed'>"+ theUILang.rssShowErrorsDelayed +"</label><br/>"+
+			"<label for='rss_relax_sanitization'>"+ theUILang.rssSanitizationLevel +"</label>"+
+			$('<select>').attr('id', 'rss_relax_sanitization')
+				.append(...Sanitize.Config.Levels
+					.map((n,i) => $('<option>')
+						.attr('value', i)
+						.text(theUILang.rssSanitizationLevels[n])
+					))[0].outerHTML + "<br/>"+
 		"</fieldset>"
 		)[0], theUILang.rssFeeds );
 	
