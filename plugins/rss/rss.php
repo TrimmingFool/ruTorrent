@@ -735,6 +735,7 @@ class rRSSData
 	public $modified = false;
 	public $interval = 30;
 	public $delayErrorsUI = true;
+	public $relaxSanitization = 0;
 }
 
 class rRSSManager
@@ -758,7 +759,7 @@ class rRSSManager
 		$this->data = new rRSSData();
 		$this->cache->get($this->data);
 	}
-	public function setSettings($interval, $delay_err_ui)
+	public function setSettings($interval, $delay_err_ui, $relax_sanitization)
 	{
 		// setInterval
 		global $minInterval;
@@ -769,6 +770,7 @@ class rRSSManager
 		$this->data->interval = $interval;
 		// set delay ui errors
 		$this->data->delayErrorsUI = (bool) $delay_err_ui;
+		$this->data->relaxSanitization = $relax_sanitization;
 		$this->cache->set($this->data);
 		$this->setHandlers();
 	}
@@ -1011,7 +1013,8 @@ class rRSSManager
 		return([
 			"next"=>$nextTouch,
 			"interval"=>$this->data->interval,
-			"delayerrui"=>$this->data->delayErrorsUI
+			"delayerrui"=>$this->data->delayErrorsUI,
+			"relaxsanitization"=>$this->data->relaxSanitization
 		]);
 	}
 	public function get()
