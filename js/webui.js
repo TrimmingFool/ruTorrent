@@ -765,9 +765,24 @@ var theWebUI =
 				}
 				if(nv!=v)
 				{
+					theWebUI.settings[i] = nv;
 					if((/^webui\./).test(i))
 					{
 						needSave = true;
+						if (
+							[
+								"webui.labelsize_rightalign",
+								"webui.show_labelsize",
+								"webui.show_searchlabelsize",
+								"webui.show_statelabelsize",
+								"webui.show_viewlabelsize",
+								"webui.show_label_path_tree",
+								"webui.show_empty_path_labels",
+								"webui.show_label_text_overflow"
+							].includes(i)
+						) {
+							theWebUI.updateLabels();
+						}
 						switch(i)
 						{
 						        case "webui.effects":
@@ -826,14 +841,12 @@ var theWebUI =
 							}
 							case "webui.update_interval":
 							{
-								theWebUI.settings["webui.update_interval"] = nv;
 								if(theWebUI.systemInfo.rTorrent.started)
 									theWebUI.resetInterval();
 								break;
 							}
 							case "webui.speedgraph.max_seconds":
 							{
-								theWebUI.settings["webui.speedgraph.max_seconds"] = nv;
 								theWebUI.speedGraph.setMaxSeconds(parseInt(theWebUI.settings['webui.speedgraph.max_seconds']))
 								theWebUI.speedGraph.draw();
 								break;
@@ -845,7 +858,6 @@ var theWebUI =
 						var k_type = o.is("input:checkbox") || o.is("select") || o.hasClass("num") ? "n" : "s";
 						req+=("&s="+k_type+i+"&v="+nv);
 					}
-					theWebUI.settings[i] = nv;
 				}
 			}
 		});
